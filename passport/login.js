@@ -6,19 +6,19 @@ module.exports = function(passport) {
 
   //Mount a LocalStrategy for named login method 'login', can have other strategies with different names, for future extension with other auth providers
   passport.use('login', new LocalStrategy({
+      usernameField: 'email', //if we are using email as the username to login instead of default username
+      /*passwordField: 'password',*/
       passReqToCallback: true
     },
-    function(req, username, password, done) {
+    function(req, email, password, done) {
       var usrroles = ['customer', 'employee', 'admin'];
       if(req.usrrole !== undefined) {
         usrroles = req.usrrole;
       }
 
-      console.log("Roles used for filtering user: " + usrroles);
-
-      // check in mongo if a user with username exists or not      
+      // check in mongo if a user with email exists or not      
       User.findOne({
-          'username': username
+          'email': email
           , 'role' : { $in : usrroles }
         },
         function(err, user) {
@@ -27,7 +27,7 @@ module.exports = function(passport) {
             return done(err);
           // Username does not exist, log the error and redirect back
           if (!user) {
-            console.log('User Not Found with username ' + username);
+            console.log('User Not Found with email ' + email);
             return done(null, false, req.flash('message', 'Invalid Login attempt or invalid username or crdentials..!'));
           }
           // User exists but wrong password, log the error 

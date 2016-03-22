@@ -47,6 +47,7 @@ module.exports = function(passport) {
   }));*/
 
   router.post('/login', function(req, res, next) {
+    console.log("********* Hey there ******** ");
     req.usrrole = undefined;
     passport.authenticate('login', {
       successRedirect: '/home',
@@ -63,54 +64,6 @@ module.exports = function(passport) {
       failureFlash: true
     })(req, res, next);
   });
-
-  /*router.post('/login', function(req, res, next) {
-    req.usrrole = undefined;
-    passport.authenticate('login', function(err, user, info) {
-      if (err) {
-        return next(err);
-      }
-      if (!user) {
-        return res.redirect('/');
-      }
-      req.logIn(user, function(err) {
-        if (err) {
-          return next(err);
-        }
-        return res.redirect('/home');
-      });
-    })(req, res, next);
-  });
-
-  router.get('/vendor', function(req, res) {
-    if (req.isAuthenticated()) {
-      //if user is already authenticated, redirect to home
-      res.redirect('/home');
-    } else {
-      // Display the Login page with any flash message, if any
-      res.render('vendorlogin', {
-        message: req.flash('message')
-      });
-    }
-  });
-
-  router.post('/vdrlogin', function(req, res, next) {
-    req.usrrole = 'vendor';
-    passport.authenticate('login', function(err, user, info) {
-      if (err) {
-        return next(err);
-      }
-      if (!user) {
-        return res.redirect('/vendor');
-      }
-      req.logIn(user, function(err) {
-        if (err) {
-          return next(err);
-        }
-        return res.redirect('/home');
-      });
-    })(req, res, next);
-  });*/
 
   //Register new user
   router.get('/signup', function(req, res) {
