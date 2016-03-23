@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var stores = require('../stores/store.js');
 
 var isAuthenticated = function(req, res, next) {
   // if user is authenticated in the session, call the next() to call the next request handler 
@@ -87,7 +88,27 @@ module.exports = function(passport) {
   });
 
   router.get('/addproduct', isAuthenticated, function(req, res) {
+    if(req.user.role != 'vendor') {
+      var err = new Error('Unauthorized access');
+      err.status = 405;
+      res.send(err);
+    }
     res.render('addproduct', {
+      user: req.user
+    });
+  });
+
+  router.post('/submitproduct', isAuthenticated, function(req, res) {
+    if(req.user.role != 'vendor') {
+      var err = new Error('Unauthorized access');
+      err.status = 405;
+      res.send(err);
+    }
+
+    stores(req, res);
+
+
+    res.render('home', {
       user: req.user
     });
   });

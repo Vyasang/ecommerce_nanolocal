@@ -7,7 +7,7 @@ module.exports = function(passport) {
   //Mount a LocalStrategy for named login method 'login', can have other strategies with different names, for future extension with other auth providers
   passport.use('login', new LocalStrategy({
       usernameField: 'email', //if we are using email as the username to login instead of default username
-      /*passwordField: 'password',*/
+      passwordField: 'password',
       passReqToCallback: true
     },
     function(req, email, password, done) {

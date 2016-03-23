@@ -34,7 +34,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(expressSession({
   secret: 'ABC-eCommerce',
   cookie: {
-    maxAge: 3600000
+    maxAge: 36000000
   },
   resave: false,
   saveUninitialized: false

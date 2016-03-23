@@ -77,7 +77,7 @@ h1.error-message{
 .form-signin .checkbox{
     font-weight: normal;
 }
-.form-signin .form-control{
+.form-control{
     position: relative;
     margin-bottom: 2px;
     font-size: 16px;
@@ -112,28 +112,13 @@ h1.error-message{
 ul.user-details{
     list-style: none;
 }
-.form-signin .btn-block {
+.btn-block {
     margin-top: 30px;
 }
 .catalog {
+    margin: 20px 0px 20px 0px;
 }
-.catalog ul {
-    display: inline;
-}
-.catalog li {
-    display: inline;
-    margin: 5px;
-    border: 1px solid blue;
 
-    width: 40px;
-    height: 30px;
-
-    min-width: 40px;
-    min-height: 30px;
-
-    max-width: 40px;    
-    max-height: 30px;
-}
 .form-product{
     max-width: 450px;
     padding: 15px;
@@ -166,4 +151,8 @@ ul.user-details{
     color: #fff;
     background-color: #6C49B1;
     border-color: #8064B5;
+}
+
+.input-group {
+    margin-bottom: 2px;   
 }
