@@ -1,6 +1,15 @@
-//Library modules
-var express = require('express'),
+/*!
+ * Copyright(c) 2016 Basavaraj K N <rajiff@gmail.com>
+ */
+
+/**
+ * Module dependencies
+ */
+
+const express = require('express'),
   path = require('path'),
+  join = require('path').join,
+  fs = require('fs'),
   favicon = require('serve-favicon'),
   logger = require('morgan'),
   cookieParser = require('cookie-parser'),
@@ -9,22 +18,22 @@ var express = require('express'),
   passport = require('passport'),
   expressSession = require('express-session'),
   flash = require('connect-flash'),
-  connectRoles = require('connect-roles');
+  connectRoles = require('connect-roles'),
+  formidable = require('formidable');
 
-//App modules
-var dbConfig = require('./config/db.js');
+const config = require('./config/config'),
+  models = join(__dirname, 'app/models');
 
-//This is a express app
-var app = express();
+const app = express();
 
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', config.root + '/app/views');
 app.set('view engine', 'ejs');
 
-//mounting middleware components
-// uncomment after placing your favicon in /public
-//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(logger('dev'));
+//Logging
+log = 'dev';
+app.use(logger(log));
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
   extended: false
@@ -34,71 +43,42 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(expressSession({
   secret: 'ABC-eCommerce',
   cookie: {
-    maxAge: 36000000
+    maxAge: 3600000
   },
   resave: false,
-  saveUninitialized: false
+  saveUninitialized: false/*,
+  store: new mongoStore({
+      url: config.db,
+      collection : 'sessions'
+    })*/
 }));
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
 
-// Initialize Passport
-var initPassport = require('./passport/init');
-initPassport(passport);
+// Bootstrap models
+fs.readdirSync(models)
+  .filter(file => ~file.search(/^[^\.].*\.js$/))
+  .forEach(file => require(join(models, file)));
 
+// Bootstrap routes
+require('./config/passport')(passport);
+require('./config/routes')(app, passport);
 
-
-
-
-
-//mount middleware routes
-var routes = require('./routes/index')(passport);
-app.use('/', routes);
-
-/*var product = require('./routes/product')(passport);
-app.use('/product', product);*/
-
-
-
-
-
-
-//Establish connection for model (DB)
-mongoose.connect(dbConfig.url);
-
-
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  var err = new Error('Not Found');
-  err.status = 404;
-  next(err);
-});
-
-
-
-// error handlers
-// development error handler
-// will print stacktrace
-if (app.get('env') === 'development') {
-  app.use(function(err, req, res, next) {
-    res.status(err.status || 500);
-    res.render('error', {
-      message: err.message,
-      error: err
-    });
+app.onListening = function(addr) {
+  //Connect to DB
+  mongoose.connect(config.db, function(err) {
+    if(err) {
+      console.log(err);
+      throw err;
+    }
   });
+
+  console.log('Nodejs Express app - ABC eCommerce has started on port ' + addr.port);
 }
 
-// production error handler
-// no stacktraces leaked to user
-app.use(function(err, req, res, next) {
-  res.status(err.status || 500);
-  res.render('error', {
-    message: err.message,
-    error: {}
-  });
-});
-
-
+/**
+ * Expose
+ */
 module.exports = app;
+
