@@ -4,14 +4,14 @@
 
 const mongoose = require('mongoose'),
 	Product = mongoose.model('Product'),
-    formidable = require('formidable'),
+	formidable = require('formidable'),
 	fs = require("fs"),
 	path = require('path'),
 	mkdirp = require('mkdirp'),
 	config = require('../../config/config');
 
 //var socket = require('socket.io-client')('http://localhost:3000/abc-employee');
-var socket = require('socket.io-client')((config.host+'/abc-employee'));
+var socket = require('socket.io-client')((config.host + '/abc-employee'));
 
 exports.home = function(req, res) {
 	const page = (req.query.page > 0 ? req.query.page : 1) - 1;
@@ -69,7 +69,8 @@ exports.createProduct = function(req, res, next) {
 				//upload image
 				uploadProductImages(files, product, req, res, next, function(product) {
 					socket.on('connection')
-					socket.emit('newproduct', {name: product.name,
+					socket.emit('newproduct', {
+						name: product.name,
 						description: product.description,
 						img: product.img,
 						unitsAvailable: product.unitsAvailable,
@@ -98,7 +99,6 @@ function uploadProductImages(files, product, req, res, next, eventcallback) {
 	});
 
 	imgpath = path.join(imgpath, productpic.name);
-	imgrelpath += "/" + productpic.name;
 
 	try {
 		fs.rename(productpic.path, imgpath, function(err) {
@@ -106,26 +106,27 @@ function uploadProductImages(files, product, req, res, next, eventcallback) {
 				console.log(err);
 				next(err);
 			}
+
+			//Absolute path is not required to be stored 
+			imgrelpath += "/" + productpic.name;
+			product.img = imgrelpath;
+
+			product.save(function(err, product) {
+				if (err) {
+					console.log(err);
+					next(err);
+				}
+
+				//console.log("Product updated with image saved at " + product.img);
+
+				eventcallback(product);
+
+				return res.redirect('/');
+			});
 		});
-	}
-	catch(err) {
+	} catch (err) {
 		console.log(err);
 		next(err);
 	}
-	//Absolute path is not required to be stored 
-	product.img = imgrelpath;
 
-	product.save(function(err, product) {
-		if (err) {
-			console.log(err);
-			next(err);
-		}
-
-		//console.log("Product updated with image saved at " + product.img);
-
-		eventcallback(product);
-
-		return res.redirect('/');
-	});
 }
-
